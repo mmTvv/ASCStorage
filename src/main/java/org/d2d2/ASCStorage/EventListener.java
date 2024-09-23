@@ -21,7 +21,8 @@ public class EventListener implements Listener {
             if (blockState instanceof TileState) {
                 TileState tile = (TileState) blockState;
                 String data = tileToString(tile); // Метод для преобразования TileState в строку
-                databaseManager.saveTileEntity(data);
+                System.out.println(data);
+                //databaseManager.saveTileEntity(data);
             }
         }
     }
