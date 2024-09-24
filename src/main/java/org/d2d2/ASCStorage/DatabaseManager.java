@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
 public class DatabaseManager {
     private Connection connection;
@@ -20,27 +21,35 @@ public class DatabaseManager {
             // Создание директории для базы данных
             File folder = new File(plugin.getDataFolder(), "ASCStorage");
             if (!folder.exists()) {
-                folder.mkdirs(); // Создает директорию, если она не существует
+                folder.mkdirs();
             }
 
             // Путь к базе данных
             File databaseFile = new File(folder, "data.db");
             connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
 
-            // Создание таблицы, если она не существует
-            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS tile_entities (id INTEGER PRIMARY KEY, data TEXT)");
+            // Создание таблицы с дополнительным столбцом для данных
+            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS tile_entities (id INTEGER PRIMARY KEY, data TEXT, additional_data TEXT)");
         } catch (SQLException e) {
             plugin.getLogger().severe("Could not connect to database: " + e.getMessage());
         }
     }
 
-    public void saveTileEntity(String data) {
+    // Метод для пакетной записи данных
+    public void saveTileEntitiesBatch(List<TileEntityData> entities) {
         try {
-            PreparedStatement pstmt = connection.prepareStatement("INSERT INTO tile_entities(data) VALUES(?)");
-            pstmt.setString(1, data);
-            pstmt.executeUpdate();
+            String sql = "INSERT INTO tile_entities(data, additional_data) VALUES(?, ?)";
+            PreparedStatement pstmt = connection.prepareStatement(sql);
+
+            for (TileEntityData entity : entities) {
+                pstmt.setString(1, entity.getData());
+                pstmt.setString(2, entity.getAdditionalData());
+                pstmt.addBatch();
+            }
+
+            pstmt.executeBatch();
         } catch (SQLException e) {
-            System.err.println("Could not save tile entity: " + e.getMessage());
+            System.err.println("Could not save tile entities: " + e.getMessage());
         }
     }
 

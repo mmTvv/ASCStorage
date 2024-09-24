@@ -1,33 +1,58 @@
 package org.d2d2.ASCStorage;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.TileState;
-import org.bukkit.Chunk;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.io.File;
 
-public class EventListener implements Listener {
-    private final DatabaseManager databaseManager;
+public class DatabaseManager {
+    private Connection connection;
+    private final ASCStorage plugin;
 
-    public EventListener(DatabaseManager databaseManager) {
-        this.databaseManager = databaseManager;
+    public DatabaseManager(ASCStorage plugin) {
+        this.plugin = plugin;
+        createDatabase();
     }
 
-    @EventHandler
-    public void onChunkLoad(ChunkLoadEvent event) {
-        Chunk chunk = event.getChunk();
-        for (BlockState blockState : chunk.getTileEntities()) {
-            if (blockState instanceof TileState) {
-                TileState tile = (TileState) blockState;
-                String data = tileToString(tile); // Метод для преобразования TileState в строку
-                System.out.println(data);
-                //databaseManager.saveTileEntity(data);
+    private void createDatabase() {
+        try {
+            File folder = new File(plugin.getDataFolder(), "ASCStorage");
+            if (!folder.exists()) {
+                folder.mkdirs();
             }
+            File databaseFile = new File(folder, "data.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:" + databaseFile.getAbsolutePath());
+
+            // Создание таблицы для хранения сундуков и шалкеров
+            connection.createStatement().execute("CREATE TABLE IF NOT EXISTS tile_entities (id INTEGER PRIMARY KEY, type TEXT, data TEXT)");
+        } catch (SQLException e) {
+            plugin.getLogger().severe("Could not connect to database: " + e.getMessage());
         }
     }
 
-    private String tileToString(TileState tile) {
-        return tile.getType().toString(); // Пример: просто имя типа
+    // Метод для пакетного сохранения данных в базу
+    public void saveTileEntitiesBatch(List<TileEntityData> tileEntities) {
+        try {
+            PreparedStatement pstmt = connection.prepareStatement("INSERT INTO tile_entities(type, data) VALUES(?, ?)");
+            for (TileEntityData entity : tileEntities) {
+                pstmt.setString(1, entity.getType());
+                pstmt.setString(2, entity.getData());
+                pstmt.addBatch();
+            }
+            pstmt.executeBatch();
+        } catch (SQLException e) {
+            System.err.println("Could not save tile entity: " + e.getMessage());
+        }
+    }
+
+    public void close() {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            System.err.println("Could not close database connection: " + e.getMessage());
+        }
     }
 }
