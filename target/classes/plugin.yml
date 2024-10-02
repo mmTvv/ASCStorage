@@ -1,7 +1,14 @@
 name: ASCStorage
 version: 1.0
-main: org.d2d2.ASCStorage.ASCStorage
+main: ord.d2d2.ASCStorage.ASCStoragePlugin
 api-version: 1.16
-folia-supported: true
-description: A plugin that saves tile entities to an SQLite database.
-authors: [GGuPP, Nakars]
+description: Плагин для сохранения содержимого шалкеров в базу данных.
+commands:
+  ascsreload:
+    description: Перезагрузка плагина
+    permission: ascstorage.admin
+permissions:
+  ascstorage.admin:
+    description: Доступ к административным командам плагина.
+    default: op
+
