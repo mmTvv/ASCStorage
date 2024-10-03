@@ -2,6 +2,8 @@ package ord.d2d2.ASCStorage;
 
 import ord.d2d2.ASCStorage.database.DatabaseManager;
 import ord.d2d2.ASCStorage.listeners.ChunkLoadListener;
+import ord.d2d2.ASCStorage.listeners.ShulkerReturnEvent;
+import ord.d2d2.ASCStorage.listeners.DelUUIDonMove;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ASCStoragePlugin extends JavaPlugin {
@@ -20,6 +22,8 @@ public class ASCStoragePlugin extends JavaPlugin {
 
         // Регистрация слушателей
         getServer().getPluginManager().registerEvents(new ChunkLoadListener(), this);
+        getServer().getPluginManager().registerEvents(new ShulkerReturnEvent(), this);
+        getServer().getPluginManager().registerEvents(new DelUUIDonMove(), this);
 
         getLogger().info("ASCStorage plugin enabled.");
     }

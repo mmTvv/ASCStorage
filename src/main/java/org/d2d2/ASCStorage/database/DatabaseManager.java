@@ -1,6 +1,7 @@
 package ord.d2d2.ASCStorage.database;
 
 import ord.d2d2.ASCStorage.ASCStoragePlugin;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -22,7 +23,11 @@ public class DatabaseManager {
         }
     }
 
-    public Connection getConnection() {
+    public Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed()) {
+            String url = "jdbc:sqlite:" + ASCStoragePlugin.getInstance().getConfig().getString("database.path");
+            connection = DriverManager.getConnection(url);
+        }
         return connection;
     }
 
