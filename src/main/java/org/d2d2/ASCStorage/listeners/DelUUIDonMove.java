@@ -6,7 +6,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import ord.d2d2.ASCStorage.utils.ShulkerUtils;
-import org.bukkit.Bukkit;
 
 import java.util.List;
 
@@ -23,15 +22,15 @@ public class DelUUIDonMove implements Listener {
 
                 // Проверяем, есть ли lore у предмета
                 if (meta.hasLore()) {
-                	List<String> lore = meta.getLore();
-	                for (String line : lore) {
-	                    if (line.startsWith("UUID: ")) {
-	                        String shulkerUUID = line.replace("UUID: ", "");
-		                    ShulkerUtils.deleteShulkerData(shulkerUUID);
-        		            meta.setLore(null);
-                		    item.setItemMeta(meta);
-                		}
-                	}
+                    List<String> lore = meta.getLore();
+                    for (String line : lore) {
+                        if (line.startsWith("UUID: ")) {
+                            String shulkerUUID = line.replace("UUID: ", "");
+                            ShulkerUtils.deleteShulkerData(shulkerUUID);
+                            meta.setLore(null);  // Удаляем UUID из lore
+                            item.setItemMeta(meta);
+                        }
+                    }
                 }
             }
         }

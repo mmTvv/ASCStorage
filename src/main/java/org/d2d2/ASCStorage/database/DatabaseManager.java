@@ -11,6 +11,7 @@ public class DatabaseManager {
 
     private Connection connection;
 
+    // Настройка базы данных
     public void setupDatabase() {
         try {
             String url = "jdbc:sqlite:" + ASCStoragePlugin.getInstance().getConfig().getString("database.path");
@@ -23,6 +24,7 @@ public class DatabaseManager {
         }
     }
 
+    // Получение соединения с базой данных
     public Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
             String url = "jdbc:sqlite:" + ASCStoragePlugin.getInstance().getConfig().getString("database.path");
@@ -31,6 +33,7 @@ public class DatabaseManager {
         return connection;
     }
 
+    // Закрытие соединения с базой данных
     public void closeDatabase() {
         try {
             if (connection != null && !connection.isClosed()) {
@@ -41,4 +44,3 @@ public class DatabaseManager {
         }
     }
 }
-

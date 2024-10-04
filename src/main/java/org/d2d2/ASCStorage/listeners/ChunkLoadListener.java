@@ -11,7 +11,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.Bukkit;
 
 public class ChunkLoadListener implements Listener {
 
@@ -23,18 +22,17 @@ public class ChunkLoadListener implements Listener {
         int chunkX = chunk.getX();
         int chunkZ = chunk.getZ();
 
-        // Используем RegionScheduler с правильными аргументами (Plugin, World, X, Z, Runnable)
+        // Используем RegionScheduler для выполнения задач в пределах чанка
         ASCStoragePlugin.getInstance().getServer().getRegionScheduler().execute(ASCStoragePlugin.getInstance(), world, chunkX, chunkZ, () -> {
             for (BlockState blockState : chunk.getTileEntities()) {
                 if (blockState instanceof Chest chest) {
                     for (ItemStack item : chest.getBlockInventory().getContents()) {
                         if (ShulkerUtils.isShulkerBox(item)) {
-                            ShulkerUtils.LoadChunks(item);
+                            ShulkerUtils.saveShulkerToDatabase(item);
                         }
                     }
-                } 
+                }
             }
         });
     }
 }
-

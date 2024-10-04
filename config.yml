@@ -1,0 +1,4 @@
+database:
+  path: "plugins/ASCStorage/data.db"
+  auto-save-interval: 5  # интервал авто-сохранения в минутах
+
